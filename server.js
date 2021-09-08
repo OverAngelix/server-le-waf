@@ -8,7 +8,7 @@ db.sequelize.sync();
 
 var corsOptions = {
 //  credentials: true, origin: "http://localhost:8080"
-credentials: true, origin: "https://le-waf-fr.herokuapp.com"
+credentials: true, origin: "https://server-le-waf.herokuapp.com"
 
 };
 
