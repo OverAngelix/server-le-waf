@@ -36,7 +36,7 @@ async function sendMail(data) {
       data.heureReservation +
       " a été validé avec succès !\n\n" +
       "Si vous desirez annuler votre reservation cliquer ici : " +
-      //  "http://localhost:8080/annulation/"+
+      //"http://localhost:8080/annulation/" +
       "https://le-waf-fr.herokuapp.com/annulation/" +
       data.token, // plain text body
 
@@ -92,7 +92,6 @@ exports.create = (req, res) => {
 exports.findAll = (req, res) => {
   const heureReservation = req.query.heureReservation;
   const dateReservation = req.query.dateReservation;
-  console.log(heureReservation + "   " + dateReservation)
   var condition = heureReservation ? { heureReservation: { [Op.eq]: `%${heureReservation}%` } } : null;
   var condition2 = dateReservation ? { dateReservation: { [Op.eq]: `%${dateReservation}%` } } : null;
 
@@ -114,6 +113,27 @@ exports.findById = (req, res) => {
   const id = req.params.id;
 
   Reservation.findByPk(id)
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving tutorials."
+      });
+    });
+};
+
+exports.findReservationDuJour = (req, res) => {
+  const dateReservation = req.query.date;
+  var condition = dateReservation ? { dateReservation: { [Op.eq]: `%${dateReservation}%` } } : null;
+
+  Reservation.findAll({
+    where: condition,
+    order: [
+      ['idTable', 'DESC'],
+    ],
+  })
     .then(data => {
       res.send(data);
     })
