@@ -34,11 +34,11 @@ async function sendMail(data) {
       data.dateReservation +
       " à " +
       data.heureReservation +
-      " a été validé avec succès !\n\n"+
-      "Si vous desirez annuler votre reservation cliquer ici :"+
-     //  "http://localhost:8080/annulation/"+
-       "https://le-waf-fr.herokuapp.com/annulation/"+
-       data.token, // plain text body
+      " a été validé avec succès !\n\n" +
+      "Si vous desirez annuler votre reservation cliquer ici : " +
+      //  "http://localhost:8080/annulation/"+
+      "https://le-waf-fr.herokuapp.com/annulation/" +
+      data.token, // plain text body
 
   });
 }
