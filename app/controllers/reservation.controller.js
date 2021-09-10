@@ -2,6 +2,15 @@ const db = require("../models");
 const Reservation = db.reservations;
 const Op = db.Sequelize.Op;
 const nodemailer = require("nodemailer");
+
+var rand = function () {
+  return Math.random().toString(36).substr(2); // remove `0.`
+};
+
+var token = function () {
+  return rand() + rand(); // to make it longer
+};
+
 async function sendMail(data) {
 
   // create reusable transporter object using the default SMTP transport
@@ -25,8 +34,12 @@ async function sendMail(data) {
       data.dateReservation +
       " à " +
       data.heureReservation +
-      " a été validé avec succès !", // plain text body
-    //  html: "<b>Hello world?</b>", // html body
+      " a été validé avec succès !\n\n"+
+      "Si vous desirez annuler votre reservation cliquer ici :"+
+     //  "http://localhost:8080/annulation/"+
+       "https://le-waf-fr.herokuapp.com/annulation/"+
+       data.token, // plain text body
+
   });
 }
 
@@ -50,6 +63,8 @@ exports.create = (req, res) => {
     dateReservation: req.body.dateReservation,
     heureReservation: req.body.heureReservation,
     idTable: req.body.idTable,
+    valide: false,
+    token: token(),
   };
 
 
@@ -57,7 +72,9 @@ exports.create = (req, res) => {
   Reservation.create(reservation)
     .then(data => {
       res.send(data);
-      sendMail(reservation).catch(console.error);
+      if (reservation.email != "") {
+        sendMail(reservation).catch(console.error);
+      }
     })
     .catch(err => {
       res.status(500).send({
@@ -93,7 +110,89 @@ exports.findAll = (req, res) => {
 };
 
 
-// Delete a Tutorial with the specified id in the request
-exports.delete = (req, res) => {
+exports.findById = (req, res) => {
+  const id = req.params.id;
 
+  Reservation.findByPk(id)
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving tutorials."
+      });
+    });
+};
+
+exports.update = (req, res) => {
+  const id = req.params.id;
+
+  Reservation.update(req.body, {
+    where: { id: id }
+  })
+    .then(num => {
+      if (num == 1) {
+        res.send({
+          message: "Reservation was updated successfully."
+        });
+      } else {
+        res.send({
+          message: `Cannot update Reservation with id=${id}. Maybe Reservation was not found or req.body is empty!`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating Reservation with id=" + id
+      });
+    });
+};
+
+exports.delete = (req, res) => {
+  const id = req.params.id;
+
+  Reservation.destroy({
+    where: { id: id }
+  })
+    .then(num => {
+      if (num == 1) {
+        res.send({
+          message: "Reservation was deleted successfully!"
+        });
+      } else {
+        res.send({
+          message: `Cannot delete Reservation with id=${id}. Maybe Reservation was not found!`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Could not delete Reservation with id=" + id
+      });
+    });
+};
+
+exports.deleteToken = (req, res) => {
+  const token = req.params.token;
+
+  Reservation.destroy({
+    where: { token: token }
+  })
+    .then(num => {
+      if (num == 1) {
+        res.send({
+          message: "Reservation was deleted successfully!"
+        });
+      } else {
+        res.send({
+          message: `Cannot delete Reservation with token=${token}. Maybe Reservation was not found!`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Could not delete Reservation with token=" + token
+      });
+    });
 };

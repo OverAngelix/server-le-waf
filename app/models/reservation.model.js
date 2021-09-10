@@ -23,7 +23,13 @@ module.exports = (sequelize, Sequelize) => {
       },
       idTable: {
         type: Sequelize.INTEGER
-      }
+      },
+      valide: {
+        type: Sequelize.BOOLEAN
+      },
+      token: {
+        type: Sequelize.STRING
+      },
     });
   
     return Reservation;
