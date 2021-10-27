@@ -15,34 +15,64 @@ async function sendMail(data) {
 
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
-    host: "smtp.live.com",
-    port: 587,
+    host: "ssl0.ovh.net",
+    port: 465,
+    secure: true,
     auth: {
-      user: "OverAngelixDevelop@outlook.fr", // generated ethereal user
-      pass: "DeathNote123", // generated ethereal password
+      user: process.env.mail, // generated ethereal user
+      pass: process.env.pass, // generated ethereal password
     },
   });
 
   // send mail with defined transport object
   let info = transporter.sendMail({
-    from: 'OverAngelixDevelop@outlook.fr', // sender address
+    from: 'reservation@lewaf.fr', // sender address
     to: data.email, // list of receivers
-    subject: "Confirmation reservation", // Subject line
-    text: "La reservation au nom de " +
+    subject: "Confirmation de votre reservation WAF", // Subject line
+    html: `
+    <p>Bonjour ${data.prenom}</p>
+<p>Votre reservation le ${data.dateReservation} &agrave; ${data.heureReservation} pour ${data.nbPersonne} personne(s) est not&eacute;e.</p>
+<p><br />Si vous desirez annuler votre reservation cliquer <a href="http://localhost:8080/annulation/${data.token}" target="_blank" >ici</a></p>
+<p>--</p>
+<p>Important : Le Buffet de boissons de 7&euro; est toujours factur&eacute; m&ecirc;me en cas de non consommation et ce sont des cr&eacute;neaux d'1H15 par table, merci de votre compr&eacute;hension !</p>
+<p>Marine et Justin,<br />Les g&eacute;rants<br /><br /><img src="https://lewaf.files.wordpress.com/2016/06/cropped-cropped-logo-petit-trans2-1-1.png" alt="" width="229" height="104" /></p>
+<p>57 rue de la Barre, 59800 Lille<br />09 83 74 60 21<br /><a href="https://lewaf.fr" target="_blank" >https://lewaf.fr</a><br /><a href="https://www.facebook.com/lewaf" target="_blank">https://www.facebook.com/lewaf</a><br /><br />&agrave; bient&ocirc;t !<br />WAF</p>
+    `
+  });
+
+}
+
+async function sendMailReservation(data) {
+
+  // create reusable transporter object using the default SMTP transport
+  let transporter = nodemailer.createTransport({
+    host: "ssl0.ovh.net",
+    port: 465,
+    secure: true,
+    auth: {
+      user: "reservation@lewaf.fr", // generated ethereal user
+      pass: "X5G9f19mph", // generated ethereal password
+    },
+  });
+
+  // send mail with defined transport object
+  let info = transporter.sendMail({
+    from: 'reservation@lewaf.fr', // sender address
+    to: 'reservation@lewaf.fr', // list of receivers
+    subject: "Nouvelle reservation", // Subject line
+    text: "" +
       data.nom +
-      " le " +
+      " " +
+      data.prenom +
+      " a reservé le " +
       data.dateReservation +
       " à " +
       data.heureReservation +
-      " a été validé avec succès !\n\n" +
-      "Si vous desirez annuler votre reservation cliquer ici : " +
-      //"http://localhost:8080/annulation/" +
-      "https://le-waf-fr.herokuapp.com/annulation/" +
-      data.token, // plain text body
-
+      " pour " +
+      data.nbPersonne
   });
-}
 
+}
 
 // Create and Save a new Tutorial
 exports.create = (req, res) => {
@@ -74,6 +104,7 @@ exports.create = (req, res) => {
       res.send(data);
       if (reservation.email != "") {
         sendMail(reservation).catch(console.error);
+        sendMailReservation(reservation).catch(console.error);
       }
     })
     .catch(err => {
