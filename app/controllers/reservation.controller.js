@@ -11,6 +11,11 @@ var token = function () {
   return rand() + rand(); // to make it longer
 };
 
+function formatDate(date) {
+  var datearray = date.split("-");
+  return datearray[2] + '/' + datearray[1] + '/' + datearray[0];
+}
+
 async function sendMail(data) {
 
   // create reusable transporter object using the default SMTP transport
@@ -26,13 +31,13 @@ async function sendMail(data) {
 
   // send mail with defined transport object
   let info = transporter.sendMail({
-    from: 'reservation@lewaf.fr', // sender address
+    from: process.env.mail, // sender address
     to: data.email, // list of receivers
     subject: "Confirmation de votre reservation WAF", // Subject line
     html: `
     <p>Bonjour ${data.prenom}</p>
-<p>Votre reservation le ${data.dateReservation} &agrave; ${data.heureReservation} pour ${data.nbPersonne} personne(s) est not&eacute;e.</p>
-<p><br />Si vous desirez annuler votre reservation cliquer <a href="http://localhost:8080/annulation/${data.token}" target="_blank" >ici</a></p>
+<p>Votre reservation le ${formatDate(data.dateReservation)} &agrave; ${data.heureReservation} pour ${data.nbPersonne} personne(s) est not&eacute;e.</p>
+<p><br />Si vous desirez annuler votre reservation cliquer <a href="https://le-waf-fr.herokuapp.com/annulation/${data.token}" target="_blank" >ici</a></p>
 <p>--</p>
 <p>Important : Le Buffet de boissons de 7&euro; est toujours factur&eacute; m&ecirc;me en cas de non consommation et ce sont des cr&eacute;neaux d'1H15 par table, merci de votre compr&eacute;hension !</p>
 <p>Marine et Justin,<br />Les g&eacute;rants<br /><br /><img src="https://lewaf.files.wordpress.com/2016/06/cropped-cropped-logo-petit-trans2-1-1.png" alt="" width="229" height="104" /></p>
@@ -65,7 +70,7 @@ async function sendMailReservation(data) {
       " " +
       data.prenom +
       " a reservé le " +
-      data.dateReservation +
+      formatDate(data.dateReservation) +
       " à " +
       data.heureReservation +
       " pour " +
