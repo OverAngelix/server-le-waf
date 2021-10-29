@@ -9,6 +9,8 @@ module.exports = app => {
   // Retrieve all Reservations
   router.get("/", reservations.findAll);
 
+  router.get("/confirmation/email", reservations.findReservationEmailPerDate);
+
   // Retrieve Reservation by id
   router.get("/:id", reservations.findById);
 

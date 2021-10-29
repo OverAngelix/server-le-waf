@@ -55,15 +55,15 @@ async function sendMailReservation(data) {
     port: 465,
     secure: true,
     auth: {
-      user: "reservation@lewaf.fr", // generated ethereal user
-      pass: "X5G9f19mph", // generated ethereal password
+      user: process.env.mail, // generated ethereal user
+      pass: process.env.pass, // generated ethereal password
     },
   });
 
   // send mail with defined transport object
   let info = transporter.sendMail({
-    from: 'reservation@lewaf.fr', // sender address
-    to: 'reservation@lewaf.fr', // list of receivers
+    from: process.env.mail, // sender address
+    to: process.env.mail, // list of receivers
     subject: "Nouvelle reservation", // Subject line
     text: "" +
       data.nom +
@@ -170,6 +170,25 @@ exports.findReservationDuJour = (req, res) => {
       ['idTable', 'DESC'],
     ],
   })
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving tutorials."
+      });
+    });
+};
+
+exports.findReservationEmailPerDate = (req, res) => {
+  const dateReservation = req.query.date;
+  const email = req.query.email;
+  var condition = email ? { email: { [Op.eq]: `${email}` } } : null;
+  var condition2 = dateReservation ? { dateReservation: { [Op.eq]: `%${dateReservation}%` } } : null;
+
+
+  Reservation.findAll({ where: { ...condition, ...condition2 } })
     .then(data => {
       res.send(data);
     })
