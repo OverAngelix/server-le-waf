@@ -21,8 +21,7 @@ async function sendMail(data) {
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
-    port: 587,
-    secure: true,
+    service: 'gmail',
     auth: {
       user: process.env.mail, // generated ethereal user
       pass: process.env.pass, // generated ethereal password
@@ -52,8 +51,7 @@ async function sendMailReservation(data) {
   // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
-    port: 587,
-    secure: true,
+    service: 'gmail',
     auth: {
       user: process.env.mail, // generated ethereal user
       pass: process.env.pass, // generated ethereal password
