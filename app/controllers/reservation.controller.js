@@ -123,6 +123,8 @@ exports.create = (req, res) => {
 //http://localhost:3001/api/reservations?heureReservation=16%3A30%3A00&dateReservation=2021-09-14%0102:00:00.000%00
 //http://localhost:3001/api/reservations
 // Retrieve all Tutorials from the database.
+
+
 exports.findAll = (req, res) => {
   const heureReservation = req.query.heureReservation;
   const dateReservation = req.query.dateReservation;
@@ -130,7 +132,9 @@ exports.findAll = (req, res) => {
   var condition2 = dateReservation ? { dateReservation: { [Op.eq]: `%${dateReservation}%` } } : null;
 
 
-  Reservation.findAll({ where: { ...condition, ...condition2 } })
+  Reservation.findAll({ where: { ...condition, ...condition2 },
+    attributes: ['nbPersonne','idTable'],
+  })
     .then(data => {
       res.send(data);
     })
@@ -143,7 +147,7 @@ exports.findAll = (req, res) => {
 };
 
 
-exports.findById = (req, res) => {
+/*exports.findById = (req, res) => {
   const id = req.params.id;
 
   Reservation.findByPk(id)
@@ -156,7 +160,7 @@ exports.findById = (req, res) => {
           err.message || "Some error occurred while retrieving tutorials."
       });
     });
-};
+};*/
 
 exports.findReservationDuJour = (req, res) => {
   const dateReservation = req.query.date;
@@ -167,6 +171,7 @@ exports.findReservationDuJour = (req, res) => {
     order: [
       ['idTable', 'DESC'],
     ],
+    attributes: ['nom', 'prenom', 'nbPersonne','heureReservation','idTable','valide','informationComplementaires'],
   })
     .then(data => {
       res.send(data);
@@ -186,9 +191,12 @@ exports.findReservationEmailPerDate = (req, res) => {
   var condition2 = dateReservation ? { dateReservation: { [Op.eq]: `%${dateReservation}%` } } : null;
 
 
-  Reservation.findAll({ where: { ...condition, ...condition2 } })
+  Reservation.findAll({ where: { ...condition, ...condition2 },
+    attributes: ['nbPersonne','heureReservation','idTable'],
+   })
     .then(data => {
       res.send(data);
+      
     })
     .catch(err => {
       res.status(500).send({
