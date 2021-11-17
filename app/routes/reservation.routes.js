@@ -1,5 +1,6 @@
 module.exports = app => {
   const reservations = require("../controllers/reservation.controller.js");
+  const login = require("../controllers/login.controller.js");
 
   var router = require("express").Router();
 
@@ -27,6 +28,8 @@ module.exports = app => {
   router.delete("/:id", reservations.delete);
 
   router.delete("/deleteToken/:token", reservations.deleteToken);
+
+  router.post("/connexion/password", login.connexion);
 
   app.use('/api/reservations', router);
 };
