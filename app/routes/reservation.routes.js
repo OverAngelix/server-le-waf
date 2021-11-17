@@ -9,13 +9,16 @@ module.exports = app => {
   // Retrieve all Reservations
   router.get("/", reservations.findAll);
 
+  // Complet or not ? 
+  router.get("/complet/jour", reservations.complet);
+
   router.get("/confirmation/email", reservations.findReservationEmailPerDate);
 
   // Retrieve Reservation by id
   // router.get("/:id", reservations.findById);
 
   // Retrieve Reservation by date
-  router.get("/reservationDuJour/jour", reservations.findReservationDuJour);
+  router.get("/reservationDuJour", reservations.findReservationDuJour);
 
   // Update a Tutorial with id
   router.put("/:id", reservations.update);

@@ -171,7 +171,7 @@ exports.findReservationDuJour = (req, res) => {
     order: [
       ['idTable', 'DESC'],
     ],
-    attributes: ['nom', 'prenom', 'nbPersonne','heureReservation','idTable','valide','informationComplementaires'],
+    attributes: ['id','nom', 'prenom', 'nbPersonne','heureReservation','idTable','valide','informationComplementaires'],
   })
     .then(data => {
       res.send(data);
@@ -180,6 +180,26 @@ exports.findReservationDuJour = (req, res) => {
       res.status(500).send({
         message:
           err.message || "Some error occurred while retrieving tutorials."
+      });
+    });
+};
+
+exports.complet = (req, res) => {
+  const dateReservation = req.query.date;
+  var condition = dateReservation ? { dateReservation: { [Op.eq]: `%${dateReservation}%` } } : null;
+
+  Reservation.findAll({
+    where: condition,
+    attributes: ['nbPersonne','idTable','heureReservation'],
+  })
+    .then(data => {
+      res.send(data);
+      console.log(res.data)
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message
       });
     });
 };
