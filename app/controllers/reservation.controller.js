@@ -147,7 +147,7 @@ exports.findAll = (req, res) => {
 };
 
 
-/*exports.findById = (req, res) => {
+exports.findById = (req, res) => {
   const id = req.params.id;
 
   Reservation.findByPk(id)
@@ -160,7 +160,7 @@ exports.findAll = (req, res) => {
           err.message || "Some error occurred while retrieving tutorials."
       });
     });
-};*/
+};
 
 exports.findReservationDuJour = (req, res) => {
   const dateReservation = req.query.date;
