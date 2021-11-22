@@ -12,8 +12,32 @@ var token = function () {
 };
 
 function formatDate(date) {
-  var datearray = date.split("-");
-  return datearray[2] + '/' + datearray[1] + '/' + datearray[0];
+  let currentIdxDate = new Date(date).getDay();
+  let fullDate = "";
+
+  switch (currentIdxDate) {
+    case 3:
+      fullDate += "mercredi "
+      break;
+    case 4:
+      fullDate += "jeudi "
+      break;
+    case 5:
+      fullDate += "vendredi "
+      break;
+    case 6:
+      fullDate += "samedi "
+      break;
+    case 1:
+      fullDate += "dimanche "
+      break;
+    default:
+      fullDate += " "
+  }
+
+  let datearray = date.split("-");
+  fullDate += datearray[2] + '/' + datearray[1] + '/' + datearray[0];
+  return fullDate;
 }
 
 async function sendMail(data) {
