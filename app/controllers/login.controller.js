@@ -1,4 +1,4 @@
 
 exports.connexion = (req, res) => {
-  res.send(req.body.password == "123");
+  res.send(req.body.password == process.env.pass);
 };
