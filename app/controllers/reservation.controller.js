@@ -14,7 +14,6 @@ var token = function () {
 function formatDate(date) {
   let currentIdxDate = new Date(date).getDay();
   let fullDate = "";
-
   switch (currentIdxDate) {
     case 3:
       fullDate += "mercredi "
@@ -64,7 +63,7 @@ async function sendMail(data) {
 <p>--</p>
 <p>Important : Le Buffet de boissons de 7&euro; est toujours factur&eacute; m&ecirc;me en cas de non consommation et ce sont des cr&eacute;neaux d'1H15 par table, merci de votre compr&eacute;hension !</p>
 <p>Marine et Justin,<br />Les g&eacute;rants<br /><br /><img src="https://lewaf.files.wordpress.com/2016/06/cropped-cropped-logo-petit-trans2-1-1.png" alt="" width="229" height="104" /></p>
-<p>57 rue de la Barre, 59800 Lille<br />09 83 74 60 21<br /><a href="https://lewaf.fr" target="_blank" >https://lewaf.fr</a><br /><a href="https://www.facebook.com/lewaf" target="_blank">https://www.facebook.com/lewaf</a><br /><br />&agrave; bient&ocirc;t !<br />WAF</p>
+<p>57 rue de la Barre, 59800 Lille<br /><a href="https://lewaf.fr" target="_blank" >https://lewaf.fr</a><br /><a href="https://www.facebook.com/lewaf" target="_blank">https://www.facebook.com/lewaf</a><br /><br />&agrave; bient&ocirc;t !<br />WAF</p>
     `
   });
 
@@ -156,8 +155,9 @@ exports.findAll = (req, res) => {
   var condition2 = dateReservation ? { dateReservation: { [Op.eq]: `%${dateReservation}%` } } : null;
 
 
-  Reservation.findAll({ where: { ...condition, ...condition2 },
-    attributes: ['nbPersonne','idTable'],
+  Reservation.findAll({
+    where: { ...condition, ...condition2 },
+    attributes: ['nbPersonne', 'idTable'],
   })
     .then(data => {
       res.send(data);
@@ -195,7 +195,7 @@ exports.findReservationDuJour = (req, res) => {
     order: [
       ['idTable', 'DESC'],
     ],
-    attributes: ['id','nom', 'prenom', 'nbPersonne','heureReservation','idTable','valide','informationComplementaires'],
+    attributes: ['id', 'nom', 'prenom', 'nbPersonne', 'heureReservation', 'idTable', 'valide', 'informationComplementaires'],
   })
     .then(data => {
       res.send(data);
@@ -214,11 +214,80 @@ exports.complet = (req, res) => {
 
   Reservation.findAll({
     where: condition,
-    attributes: ['nbPersonne','idTable','heureReservation'],
+    order: [
+      ['idTable', 'ASC'],
+      ['heureReservation', 'ASC'],
+    ],
+    attributes: ['nbPersonne', 'idTable', 'heureReservation'],
+    raw: true,
   })
     .then(data => {
-      res.send(data);
-      console.log(res.data)
+      let tables = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0],];
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].idTable == 6 && data[i].nbPersonne < 4) {
+          if (data[i].heureReservation == '12:00:00') {
+            (tables[data[i].idTable - 1][0] = tables[data[i].idTable - 1][0] + 0.5)
+          }
+          if (data[i].heureReservation == '13:30:00') {
+            (tables[data[i].idTable - 1][1] = tables[data[i].idTable - 1][1] + 0.5)
+          }
+          if (data[i].heureReservation == '14:45:00') {
+            (tables[data[i].idTable - 1][2] = tables[data[i].idTable - 1][2] + 0.5)
+          }
+          if (data[i].heureReservation == '16:00:00') {
+            (tables[data[i].idTable - 1][3] = tables[data[i].idTable - 1][3] + 0.5)
+          }
+          if (data[i].heureReservation == '17:15:00') {
+            (tables[data[i].idTable - 1][4] = tables[data[i].idTable - 1][4] + 0.5)
+          }
+        }
+        else {
+          if (data[i].heureReservation == '12:00:00') {
+            (tables[data[i].idTable - 1][0]++)
+          }
+          if (data[i].heureReservation == '13:30:00') {
+            (tables[data[i].idTable - 1][1]++)
+          }
+          if (data[i].heureReservation == '14:45:00') {
+            (tables[data[i].idTable - 1][2]++)
+          }
+          if (data[i].heureReservation == '16:00:00') {
+            (tables[data[i].idTable - 1][3]++)
+          }
+          if (data[i].heureReservation == '17:15:00') {
+            (tables[data[i].idTable - 1][4]++)
+          }
+        }
+      }
+      let places = 0;
+      let creneaux = [-1, -1, -1, -1, -1];
+      let indexCreneaux = 0;
+      for (let i = 0; i < tables.length; i++) {
+        for (let j = 0; j < tables[i].length; j++) {
+          if (tables[i][j] != 1) {
+            creneaux[indexCreneaux] = j;
+            indexCreneaux++;
+          }
+          places += tables[i][j];
+        }
+      }
+      //CODE 1000 => NOUS SOMMES COMPLETS SI NB=45 NOUS VOUS INVITONS A RESERVER POUR DEMAIN
+      if (places == 45) {
+        res.send("{'Code':'1000'}");
+      }
+      //CODE 1001 => RETOURNE LES CRENEAUX REMPLIE ET LES RETIRER
+      if (places >= 40 && places < 45) {
+        creneaux = creneaux.sort().filter(function (el, i, a) { return i === a.indexOf(el) });
+        for (let i = 0; i < creneaux.length; i++) {
+        }
+        res.send("{'Code':'1001'}");
+      }
+      //CODE 1002 => LAISSER TOUS LES CRENEAUX
+      if (places < 40) {
+        res.send("{'Code':'1002'}");
+      }
     })
     .catch(err => {
       res.status(500).send({
@@ -235,12 +304,13 @@ exports.findReservationEmailPerDate = (req, res) => {
   var condition2 = dateReservation ? { dateReservation: { [Op.eq]: `%${dateReservation}%` } } : null;
 
 
-  Reservation.findAll({ where: { ...condition, ...condition2 },
-    attributes: ['nbPersonne','heureReservation','idTable'],
-   })
+  Reservation.findAll({
+    where: { ...condition, ...condition2 },
+    attributes: ['nbPersonne', 'heureReservation', 'idTable'],
+  })
     .then(data => {
       res.send(data);
-      
+
     })
     .catch(err => {
       res.status(500).send({
