@@ -262,31 +262,55 @@ exports.complet = (req, res) => {
         }
       }
       let places = 0;
-      let creneaux = [-1, -1, -1, -1, -1];
-      let indexCreneaux = 0;
+      let creneaux = [
+        {
+          heure: "12:00",
+          heurelabel: "12:00 - 13:30",
+        },
+        {
+          heure: "13:30",
+          heurelabel: "13:30 - 14:45",
+        },
+        {
+          heure: "14:45",
+          heurelabel: "14:45 - 16:00",
+        },
+        {
+          heure: "16:00",
+          heurelabel: "16:00 - 17:15",
+        },
+        {
+          heure: "17:15",
+          heurelabel: "17:15 - 18:30",
+        },
+      ];
       for (let i = 0; i < tables.length; i++) {
         for (let j = 0; j < tables[i].length; j++) {
           if (tables[i][j] != 1) {
-            creneaux[indexCreneaux] = j;
-            indexCreneaux++;
+            creneaux.splice(j, 1);
           }
           places += tables[i][j];
         }
       }
       //CODE 1000 => NOUS SOMMES COMPLETS SI NB=45 NOUS VOUS INVITONS A RESERVER POUR DEMAIN
       if (places == 45) {
-        res.send("{'Code':'1000'}");
+        res.send(JSON.parse('{"code":"1000"}'));
       }
       //CODE 1001 => RETOURNE LES CRENEAUX REMPLIE ET LES RETIRER
-      if (places >= 40 && places < 45) {
-        creneaux = creneaux.sort().filter(function (el, i, a) { return i === a.indexOf(el) });
-        for (let i = 0; i < creneaux.length; i++) {
+      else if (places < 45) {
+        if (creneaux.length > 0) {
+          let json = '{"code":"1001","creneaux":[';
+          creneaux.forEach(element => {
+            json += `{"heure": "${element.heure}", "heurelabel": "${element.heurelabel}"},`
+          });
+          json = json.substring(0, json.length - 1)
+          json += ']}';
+          console.log(json)
+          res.send(JSON.parse(json));
+        } else {
+          let json = '{"code":"1001","creneaux":[]}';
+          res.send(JSON.parse(json));
         }
-        res.send("{'Code':'1001'}");
-      }
-      //CODE 1002 => LAISSER TOUS LES CRENEAUX
-      if (places < 40) {
-        res.send("{'Code':'1002'}");
       }
     })
     .catch(err => {
