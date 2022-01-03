@@ -61,7 +61,7 @@ async function sendMail(data) {
 <p>Votre reservation le ${formatDate(data.dateReservation)} &agrave; ${data.heureReservation} pour ${data.nbPersonne} personne(s) est not&eacute;e.</p>
 <p><br />Si vous desirez annuler votre reservation cliquer <a href="https://www.lewaf.fr/annulation/${data.token}" target="_blank" >ici</a></p>
 <p>--</p>
-<p>Important : Le Buffet de boissons de 7&euro; est toujours factur&eacute; m&ecirc;me en cas de non consommation et ce sont des cr&eacute;neaux d'1H15 par table, merci de votre compr&eacute;hension !</p>
+<p>Important : Le Buffet de boissons de 8&euro; est toujours factur&eacute; m&ecirc;me en cas de non consommation et ce sont des cr&eacute;neaux d'1H15 par table, merci de votre compr&eacute;hension !</p>
 <p>Marine et Justin,<br />Les g&eacute;rants<br /><br /><img src="https://lewaf.files.wordpress.com/2016/06/cropped-cropped-logo-petit-trans2-1-1.png" alt="" width="229" height="104" /></p>
 <p>57 rue de la Barre, 59800 Lille<br /><a href="https://lewaf.fr" target="_blank" >https://lewaf.fr</a><br /><a href="https://www.facebook.com/lewaf" target="_blank">https://www.facebook.com/lewaf</a><br /><br />&agrave; bient&ocirc;t !<br />WAF</p>
     `
