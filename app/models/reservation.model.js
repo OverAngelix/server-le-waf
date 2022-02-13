@@ -30,6 +30,12 @@ module.exports = (sequelize, Sequelize) => {
       token: {
         type: Sequelize.STRING
       },
+      nbQuiches: {
+        type: Sequelize.INTEGER
+      },
+      nbSandwichs: {
+        type: Sequelize.INTEGER
+      },
     });
   
     return Reservation;

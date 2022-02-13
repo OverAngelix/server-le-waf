@@ -119,6 +119,8 @@ exports.create = (req, res) => {
     dateReservation: req.body.dateReservation,
     heureReservation: req.body.heureReservation,
     idTable: req.body.idTable,
+    nbQuiches: req.body.nbQuiches,
+    nbSandwichs: req.body.nbSandwichs,
     valide: false,
     token: token(),
   };
@@ -195,7 +197,7 @@ exports.findReservationDuJour = (req, res) => {
     order: [
       ['idTable', 'DESC'],
     ],
-    attributes: ['id', 'nom', 'prenom', 'nbPersonne', 'heureReservation', 'idTable', 'valide', 'informationComplementaires'],
+    attributes: ['id', 'nom', 'prenom', 'nbPersonne', 'heureReservation', 'idTable', 'valide', 'informationComplementaires','nbQuiches','nbSandwichs'],
   })
     .then(data => {
       res.send(data);
